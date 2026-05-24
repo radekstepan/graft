@@ -11,6 +11,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "atoms-alt": "*",
     "jotai": "^2.12.5",
     "jotai-branch": "*",
     "react": "^18.3.1",

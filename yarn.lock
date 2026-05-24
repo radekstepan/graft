@@ -774,6 +774,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"atoms-alt@npm:*, atoms-alt@workspace:packages/atoms-alt":
+  version: 0.0.0-use.local
+  resolution: "atoms-alt@workspace:packages/atoms-alt"
+  dependencies:
+    "@types/react": "npm:^18.3.23"
+    react: "npm:^18.3.1"
+    typescript: "npm:^5.8.3"
+  peerDependencies:
+    react: ^18.0.0
+  languageName: unknown
+  linkType: soft
+
 "baseline-browser-mapping@npm:^2.10.12":
   version: 2.10.32
   resolution: "baseline-browser-mapping@npm:2.10.32"
@@ -1188,6 +1200,7 @@ __metadata:
     "@types/react": "npm:^18.3.23"
     "@types/react-dom": "npm:^18.3.7"
     "@vitejs/plugin-react": "npm:^4.5.2"
+    atoms-alt: "npm:*"
     jotai: "npm:^2.12.5"
     jotai-branch: "npm:*"
     react: "npm:^18.3.1"
