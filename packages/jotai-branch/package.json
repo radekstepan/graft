@@ -1,0 +1,33 @@
+{
+  "name": "jotai-branch",
+  "version": "0.1.0",
+  "description": "Branching Atoms — Shadow Store extension for Jotai v2",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "jotai": "^2.0.0",
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.23",
+    "jotai": "^2.12.5",
+    "react": "^18.3.1",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,628 @@
+/* ===================================================================
+   Design System — Branching Atoms Playground
+   Dark-mode, glassmorphism, Inter + JetBrains Mono
+   =================================================================== */
+
+:root {
+  /* Palette */
+  --bg-base:        #0a0b0f;
+  --bg-surface:     #12141a;
+  --bg-glass:       rgba(255, 255, 255, 0.04);
+  --bg-glass-hover: rgba(255, 255, 255, 0.07);
+  --border:         rgba(255, 255, 255, 0.08);
+  --border-accent:  rgba(139, 92, 246, 0.4);
+
+  /* Brand */
+  --violet:         #8b5cf6;
+  --violet-bright:  #a78bfa;
+  --violet-dim:     rgba(139, 92, 246, 0.15);
+  --indigo:         #6366f1;
+  --cyan:           #22d3ee;
+  --emerald:        #34d399;
+  --rose:           #fb7185;
+  --amber:          #fbbf24;
+
+  /* Text */
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #475569;
+  --text-code:      #a5b4fc;
+
+  /* Misc */
+  --radius-sm:      6px;
+  --radius:         12px;
+  --radius-lg:      18px;
+  --shadow-glow:    0 0 40px rgba(139, 92, 246, 0.15);
+  --transition:     0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color-scheme: dark;
+}
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { height: 100%; }
+body { background: var(--bg-base); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+button { cursor: pointer; font-family: inherit; }
+input, textarea { font-family: inherit; }
+a { color: var(--violet-bright); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ===================================================================
+   Layout
+   =================================================================== */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 2rem;
+  height: 60px;
+  background: rgba(10, 11, 15, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.header-logo {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--violet) 0%, var(--cyan) 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.header-title {
+  font-size: 15px;
+  font-weight: 600;
+  background: linear-gradient(90deg, var(--text-primary) 0%, var(--violet-bright) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--violet-dim);
+  border: 1px solid var(--border-accent);
+  color: var(--violet-bright);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+}
+
+.tab-btn {
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass-hover);
+}
+
+.tab-btn.active {
+  background: var(--violet);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ===================================================================
+   Demo containers
+   =================================================================== */
+.demo-header {
+  margin-bottom: 2rem;
+}
+
+.demo-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.demo-description {
+  color: var(--text-secondary);
+  font-size: 14px;
+  max-width: 680px;
+  line-height: 1.7;
+}
+
+.demo-description code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-code);
+  background: var(--violet-dim);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: border-color var(--transition);
+}
+
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.card-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.card.branch-card {
+  border-color: var(--border-accent);
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.08);
+}
+
+/* Two-column layout */
+.cols-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 680px) {
+  .cols-2 { grid-template-columns: 1fr; }
+}
+
+/* ===================================================================
+   Form elements
+   =================================================================== */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.field:last-child { margin-bottom: 0; }
+
+.field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--violet);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.field input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.field select option {
+  background: var(--bg-surface);
+}
+
+/* ===================================================================
+   Buttons
+   =================================================================== */
+.btn-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--violet) 0%, var(--indigo) 100%);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.35);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5);
+}
+
+.btn-ghost {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-glass-hover);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-danger {
+  background: rgba(251, 113, 133, 0.12);
+  border: 1px solid rgba(251, 113, 133, 0.3);
+  color: var(--rose);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(251, 113, 133, 0.2);
+}
+
+.btn-success {
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: var(--emerald);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: rgba(52, 211, 153, 0.2);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+/* ===================================================================
+   Value display / badges
+   =================================================================== */
+.value-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-code);
+  background: rgba(165, 180, 252, 0.06);
+  border: 1px solid rgba(165, 180, 252, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  word-break: break-all;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-violet {
+  background: var(--violet-dim);
+  border: 1px solid var(--border-accent);
+  color: var(--violet-bright);
+}
+
+.badge-emerald {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: var(--emerald);
+}
+
+.badge-rose {
+  background: rgba(251, 113, 133, 0.1);
+  border: 1px solid rgba(251, 113, 133, 0.3);
+  color: var(--rose);
+}
+
+.badge-amber {
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: var(--amber);
+}
+
+.badge-muted {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+/* ===================================================================
+   Status / log rows
+   =================================================================== */
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.status-row:last-child { border-bottom: none; }
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-violet { background: var(--violet); box-shadow: 0 0 6px var(--violet); }
+.dot-emerald { background: var(--emerald); box-shadow: 0 0 6px var(--emerald); }
+.dot-rose { background: var(--rose); box-shadow: 0 0 6px var(--rose); }
+.dot-amber { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.dot-muted { background: var(--text-muted); }
+
+/* Pulse animation */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+}
+
+.dot-pulse {
+  animation: pulse-ring 1.5s infinite;
+}
+
+/* ===================================================================
+   Todo list
+   =================================================================== */
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+}
+
+.todo-item:hover {
+  background: var(--bg-glass-hover);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.todo-item.optimistic {
+  border-color: var(--border-accent);
+  background: var(--violet-dim);
+}
+
+.todo-item.done .todo-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.todo-text {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-primary);
+  transition: color var(--transition);
+}
+
+/* ===================================================================
+   Nested branch visualization
+   =================================================================== */
+.nest-layer {
+  border-radius: var(--radius);
+  border: 1px dashed var(--border);
+  padding: 1rem;
+  position: relative;
+}
+
+.nest-layer + .nest-layer {
+  margin-top: 0.75rem;
+}
+
+.nest-label {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  background: var(--bg-surface);
+  padding: 0 6px;
+}
+
+.nest-layer.layer-global { border-color: rgba(52, 211, 153, 0.3); }
+.nest-layer.layer-a      { border-color: rgba(139, 92, 246, 0.4); }
+.nest-layer.layer-b      { border-color: rgba(34, 211, 238, 0.4); }
+
+/* ===================================================================
+   Live sync indicators
+   =================================================================== */
+.sync-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.sync-atom {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.875rem 1rem;
+  transition: all var(--transition);
+}
+
+.sync-atom.shadowed {
+  border-color: var(--border-accent);
+  background: var(--violet-dim);
+}
+
+.sync-atom.updated {
+  animation: flash 0.4s ease;
+}
+
+@keyframes flash {
+  0%   { background: rgba(52, 211, 153, 0.2); border-color: var(--emerald); }
+  100% { background: var(--bg-glass); border-color: var(--border); }
+}
+
+.sync-atom-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.sync-atom-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ===================================================================
+   Info box
+   =================================================================== */
+.info-box {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.info-box.info-violet {
+  background: var(--violet-dim);
+  border: 1px solid var(--border-accent);
+  color: var(--violet-bright);
+}
+
+.info-box.info-emerald {
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  color: var(--emerald);
+}
+
+.info-box.info-amber {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  color: var(--amber);
+}
+
+/* ===================================================================
+   Divider
+   =================================================================== */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1.25rem 0;
+}
+
+/* ===================================================================
+   Scrollbar
+   =================================================================== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ===================================================================
+   Spinner
+   =================================================================== */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
