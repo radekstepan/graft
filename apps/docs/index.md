@@ -10,6 +10,9 @@ hero:
       text: Get Started
       link: /jotai-branch/getting-started
     - theme: alt
+      text: Playground
+      link: /playground
+    - theme: alt
       text: View on GitHub
       link: https://github.com/pmndrs/jotai
 
