@@ -6,3 +6,4 @@ dist
 .DS_Store
 .yarn
 .vitepress/
+repomix-output.xml
