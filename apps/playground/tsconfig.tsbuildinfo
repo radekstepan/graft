@@ -1,1 +1,0 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/demos/customhandlers.tsx","./src/demos/handlerstackbasics.tsx","./src/demos/livesync.tsx","./src/demos/nestedbranches.tsx","./src/demos/optimistictodos.tsx","./src/demos/profileeditor.tsx","./vite.config.ts"],"version":"5.9.3"}

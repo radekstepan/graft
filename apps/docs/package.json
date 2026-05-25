@@ -8,7 +8,17 @@
     "build": "vitepress build",
     "preview": "vitepress preview"
   },
+  "dependencies": {
+    "atoms-alt": "*",
+    "jotai": "^2.12.5",
+    "jotai-branch": "*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
   "devDependencies": {
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.5.2",
     "vitepress": "^1.2.2",
     "vue": "^3.4.27"
   }
