@@ -82,18 +82,38 @@ export interface BranchStore {
   sub(atom: Atom<unknown>, listener: Listener): Unsubscribe;
 
   /**
-   * Flush all local overrides (Mutations_B) to the base store,
-   * then clear the branch. The branch is effectively empty after this
-   * and any future reads fall through to the now-updated base store.
+   * Flush local overrides (Mutations_B) to the base store, then clear the
+   * branch. The branch is effectively empty after this and any future reads
+   * fall through to the now-updated base store.
+   *
+   * @example
+   * // Commit all overrides
+   * branch.commit();
+   *
+   * // Commit only specific atoms
+   * branch.commit(nameAtom);
+   * branch.commit([nameAtom, ageAtom]);
    */
   commit(): void;
+  commit(atoms: Atom<unknown>): void;
+  commit(atoms: Atom<unknown>[]): void;
 
   /**
-   * Discard all local overrides without touching the base store.
+   * Discard local overrides without touching the base store.
    * All subscribed components are notified so they re-render with
    * the base store's current values.
+   *
+   * @example
+   * // Discard all overrides
+   * branch.discard();
+   *
+   * // Discard only specific atoms
+   * branch.discard(nameAtom);
+   * branch.discard([nameAtom, ageAtom]);
    */
   discard(): void;
+  discard(atoms: Atom<unknown>): void;
+  discard(atoms: Atom<unknown>[]): void;
 
   /**
    * Remove a single atom from Mutations_B, reverting it to the base store's

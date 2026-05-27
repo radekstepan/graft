@@ -135,6 +135,55 @@ describe('commit()', () => {
     base.set(a, 55); // base value changes after commit
     expect(branch.get(a)).toBe(55); // branch has no override, falls through
   });
+
+  it('partial commit with single atom flushes only that atom', () => {
+    const { base, branch } = makeBranch();
+    const a = atom(0);
+    const b = atom('x');
+    branch.set(a, 42);
+    branch.set(b, 'z');
+    branch.commit(a);
+    expect(base.get(a)).toBe(42);
+    expect(base.get(b)).toBe('x');
+    expect(branch.has(a)).toBe(false);
+    expect(branch.has(b)).toBe(true);
+    expect(branch.size).toBe(1);
+  });
+
+  it('partial commit with array of atoms flushes only those atoms', () => {
+    const { base, branch } = makeBranch();
+    const a = atom(0);
+    const b = atom('x');
+    const c = atom(true);
+    branch.set(a, 1);
+    branch.set(b, 'y');
+    branch.set(c, false);
+    branch.commit([a, c]);
+    expect(base.get(a)).toBe(1);
+    expect(base.get(b)).toBe('x');
+    expect(base.get(c)).toBe(false);
+    expect(branch.has(a)).toBe(false);
+    expect(branch.has(b)).toBe(true);
+    expect(branch.has(c)).toBe(false);
+    expect(branch.size).toBe(1);
+  });
+
+  it('partial commit notifies listeners for committed atoms only', () => {
+    const { branch } = makeBranch();
+    const a = atom(0);
+    const b = atom(0);
+    const listenerA = vi.fn();
+    const listenerB = vi.fn();
+    branch.sub(a, listenerA);
+    branch.sub(b, listenerB);
+    branch.set(a, 1);
+    branch.set(b, 2);
+    listenerA.mockClear();
+    listenerB.mockClear();
+    branch.commit(a);
+    expect(listenerA).toHaveBeenCalledTimes(1);
+    expect(listenerB).not.toHaveBeenCalled();
+  });
 });
 
 // ── discard() ─────────────────────────────────────────────────────────────────
@@ -170,6 +219,54 @@ describe('discard()', () => {
     branch.set(atom(0), 1);
     branch.discard();
     expect(cb).toHaveBeenCalledTimes(1);
+  });
+
+  it('partial discard with single atom reverts only that atom', () => {
+    const { base, branch } = makeBranch();
+    const a = atom(0);
+    const b = atom('x');
+    base.set(a, 10);
+    base.set(b, 'base');
+    branch.set(a, 99);
+    branch.set(b, 'draft');
+    branch.discard(a);
+    expect(base.get(a)).toBe(10);
+    expect(branch.get(a)).toBe(10);
+    expect(branch.has(a)).toBe(false);
+    expect(branch.has(b)).toBe(true);
+    expect(branch.size).toBe(1);
+  });
+
+  it('partial discard with array of atoms reverts only those atoms', () => {
+    const { base, branch } = makeBranch();
+    const a = atom(0);
+    const b = atom('x');
+    const c = atom(true);
+    branch.set(a, 1);
+    branch.set(b, 'y');
+    branch.set(c, false);
+    branch.discard([a, c]);
+    expect(branch.has(a)).toBe(false);
+    expect(branch.has(b)).toBe(true);
+    expect(branch.has(c)).toBe(false);
+    expect(branch.size).toBe(1);
+  });
+
+  it('partial discard notifies listeners for discarded atoms only', () => {
+    const { branch } = makeBranch();
+    const a = atom(0);
+    const b = atom(0);
+    const listenerA = vi.fn();
+    const listenerB = vi.fn();
+    branch.sub(a, listenerA);
+    branch.sub(b, listenerB);
+    branch.set(a, 1);
+    branch.set(b, 2);
+    listenerA.mockClear();
+    listenerB.mockClear();
+    branch.discard(a);
+    expect(listenerA).toHaveBeenCalledTimes(1);
+    expect(listenerB).not.toHaveBeenCalled();
   });
 });
 
@@ -397,5 +494,165 @@ describe('_onMutation internal callbacks', () => {
     branch.set(a, 1);
     branch.set(a, 2);
     expect(cb).toHaveBeenCalledTimes(2);
+  });
+});
+
+// ── Async derived atoms ────────────────────────────────────────────────────
+
+describe('async derived atoms', () => {
+  it('provides a real AbortSignal to async atom reads', async () => {
+    const { branch } = makeBranch();
+    const baseAtom = atom('hello');
+
+    let capturedSignal: AbortSignal | undefined;
+    const asyncAtom = atom(async (get, opts) => {
+      capturedSignal = opts.signal;
+      return get(baseAtom).toUpperCase();
+    });
+
+    const promise = branch.get(asyncAtom);
+    expect(capturedSignal).toBeInstanceOf(AbortSignal);
+    await promise;
+  });
+
+  it('resolves async derived atom with branch overrides', async () => {
+    const { branch } = makeBranch();
+    const baseAtom = atom('hello');
+
+    const asyncAtom = atom(async (get) => {
+      return get(baseAtom).toUpperCase();
+    });
+
+    branch.set(baseAtom, 'world');
+    const result = await branch.get(asyncAtom);
+    expect(result).toBe('WORLD');
+  });
+
+  it('aborts previous read when re-reading the same async atom', async () => {
+    const { branch } = makeBranch();
+    const baseAtom = atom(1);
+
+    const abortedSignals: boolean[] = [];
+    const asyncAtom = atom(async (get, opts) => {
+      const val = get(baseAtom);
+      opts.signal.addEventListener('abort', () => {
+        abortedSignals.push(true);
+      });
+      await new Promise((r) => setTimeout(r, 0));
+      return val * 2;
+    });
+
+    branch.get(asyncAtom);
+    branch.set(baseAtom, 2);
+    branch.get(asyncAtom);
+
+    expect(abortedSignals.length).toBe(1);
+  });
+
+  it('sync derived atom still works with signal present', () => {
+    const { branch } = makeBranch();
+    const nameAtom = atom('Alice');
+    const greetAtom = atom((get, _opts) => `Hello, ${get(nameAtom)}!`);
+    branch.set(nameAtom, 'Bob');
+    expect(branch.get(greetAtom)).toBe('Hello, Bob!');
+  });
+
+  it('commit clears all read controllers', async () => {
+    const { branch } = makeBranch();
+    const baseAtom = atom('x');
+    let resolvePromise: () => void = () => {};
+    const asyncAtom = atom(async (get) => {
+      await new Promise<void>((r) => { resolvePromise = r; });
+      return get(baseAtom);
+    });
+
+    branch.get(asyncAtom);
+    branch.commit();
+    resolvePromise();
+
+    const internal = branch as any;
+    expect(internal._readControllers).toBeUndefined();
+  });
+
+  it('cleans up controller after async read resolves', async () => {
+    const { branch } = makeBranch();
+    const baseAtom = atom('x');
+    const asyncAtom = atom(async (get) => {
+      await new Promise((r) => setTimeout(r, 0));
+      return get(baseAtom);
+    });
+
+    await branch.get(asyncAtom);
+
+    const internal = branch as any;
+    expect(internal._readControllers).toBeUndefined();
+  });
+
+  it('does not clean up controller if a newer read replaced it', async () => {
+    const { branch } = makeBranch();
+    const baseAtom = atom(1);
+    let resolveFirst: () => void = () => {};
+    let resolveSecond: () => void = () => {};
+
+    const asyncAtom = atom(async (get) => {
+      const val = get(baseAtom);
+      if (val === 1) {
+        await new Promise<void>((r) => { resolveFirst = r; });
+      } else {
+        await new Promise<void>((r) => { resolveSecond = r; });
+      }
+      return val * 2;
+    });
+
+    branch.get(asyncAtom);
+    branch.set(baseAtom, 2);
+    branch.get(asyncAtom);
+
+    resolveSecond();
+    await new Promise((r) => setTimeout(r, 0));
+
+    const internal = branch as any;
+    expect(internal._readControllers).toBeUndefined();
+
+    resolveFirst();
+  });
+});
+
+// ── setSelf in read options ────────────────────────────────────────────────
+
+describe('setSelf in derived atom reads', () => {
+  it('setSelf routes through the branch store', async () => {
+    const { base, branch } = makeBranch();
+    const countAtom = atom(0);
+
+    const selfWritingAtom = atom(
+      (get, { setSelf }) => {
+        const val = get(countAtom);
+        if (val === 0) setSelf(42);
+        return val;
+      },
+      (_get, set, newValue: number) => {
+        set(countAtom, newValue);
+      },
+    );
+
+    branch.get(selfWritingAtom);
+
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(branch.get(countAtom)).toBe(42);
+    expect(base.get(countAtom)).toBe(0);
+  });
+
+  it('setSelf is undefined for read-only derived atoms', () => {
+    const { branch } = makeBranch();
+    let capturedSetSelf: unknown = 'not-undefined';
+    const derivedAtom = atom((get, opts) => {
+      capturedSetSelf = opts.setSelf;
+      return get(atom(1));
+    });
+
+    branch.get(derivedAtom);
+    expect(capturedSetSelf).toBeUndefined();
   });
 });

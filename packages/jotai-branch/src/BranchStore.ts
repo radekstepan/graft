@@ -67,6 +67,9 @@ export function createBranchStore(baseStore: JotaiStore): BranchStore {
   // Subscriptions held on the base store (one per atom ever subscribed)
   const baseSubs = new Map<Atom<unknown>, Unsubscribe>();
 
+  // AbortControllers for in-flight async derived atom reads
+  const readControllers = new Map<Atom<unknown>, AbortController>();
+
   // Lifecycle event sets (internal — used by useBranchStatus etc.)
   const onMutation = new Set<() => void>();
   const onCommit   = new Set<() => void>();
@@ -84,6 +87,28 @@ export function createBranchStore(baseStore: JotaiStore): BranchStore {
 
   function fireMutation(): void {
     onMutation.forEach((fn) => fn());
+  }
+
+  function abortControllerFor(atom: Atom<unknown>): void {
+    const controller = readControllers.get(atom);
+    if (controller) {
+      controller.abort();
+      readControllers.delete(atom);
+    }
+  }
+
+  function abortAllControllers(): void {
+    for (const [, controller] of readControllers) {
+      controller.abort();
+    }
+    readControllers.clear();
+  }
+
+  function normalizeAtomArg(
+    atoms: Atom<unknown> | Atom<unknown>[] | undefined
+  ): Atom<unknown>[] | undefined {
+    if (atoms === undefined) return undefined;
+    return Array.isArray(atoms) ? atoms : [atoms];
   }
 
   // ── Base-store subscription management ─────────────────────────────────
@@ -163,13 +188,45 @@ export function createBranchStore(baseStore: JotaiStore): BranchStore {
 
     // Derived atom — re-run the read function with branchGet as the Getter
     // so all dependency lookups resolve through the branch.
-    // The second argument is `options` (contains `signal` and `setSelf` for
-    // suspense/async support). In a sync branch resolution context we pass an
-    // empty object as a safe proxy.
-    return atom.read(
+    // We provide a real AbortSignal so async atoms can cancel stale reads.
+    const prevController = readControllers.get(atom as Atom<unknown>);
+    if (prevController) {
+      prevController.abort();
+    }
+
+    const controller = new AbortController();
+    readControllers.set(atom as Atom<unknown>, controller);
+
+    const setSelf =
+      'write' in atom
+        ? (...args: unknown[]) => {
+            (
+              atom as unknown as WritableAtom<unknown, unknown[], unknown>
+            ).write(branchGet as any, branchSet as any, ...args);
+          }
+        : undefined;
+
+    const result = atom.read(
       branchGet as Parameters<typeof atom.read>[0],
-      {} as Parameters<typeof atom.read>[1]
+      { signal: controller.signal, setSelf } as Parameters<
+        typeof atom.read
+      >[1],
     );
+
+    const isPromise =
+      result != null && typeof (result as any).then === 'function';
+    if (isPromise) {
+      const onDone = () => {
+        if (readControllers.get(atom as Atom<unknown>) === controller) {
+          readControllers.delete(atom as Atom<unknown>);
+        }
+      };
+      (result as unknown as Promise<unknown>).finally(onDone);
+    } else {
+      readControllers.delete(atom as Atom<unknown>);
+    }
+
+    return result;
   }
 
   branchSet = function branchSetImpl<Value, Args extends unknown[], Result>(
@@ -239,28 +296,56 @@ export function createBranchStore(baseStore: JotaiStore): BranchStore {
       };
     },
 
-    commit(): void {
-      // Flush every local override to the base store
-      for (const [atom, value] of mutations) {
-        baseStore.set(
-          atom as WritableAtom<unknown, [unknown], void>,
-          value,
-        );
+    commit(...args: [] | [Atom<unknown>] | [Atom<unknown>[]]): void {
+      const targets = args.length > 0 ? normalizeAtomArg(args[0]) : undefined;
+
+      if (targets) {
+        for (const a of targets) {
+          if (!mutations.has(a)) continue;
+          baseStore.set(
+            a as WritableAtom<unknown, [unknown], void>,
+            mutations.get(a),
+          );
+          mutations.delete(a);
+          abortControllerFor(a);
+          notifyAtom(a);
+        }
+      } else {
+        for (const [atom, value] of mutations) {
+          baseStore.set(
+            atom as WritableAtom<unknown, [unknown], void>,
+            value,
+          );
+        }
+        mutations.clear();
+        abortAllControllers();
+        notifyAll();
       }
-      mutations.clear();
-      notifyAll();
       onCommit.forEach((fn) => fn());
     },
 
-    discard(): void {
-      mutations.clear();
-      notifyAll();
+    discard(...args: [] | [Atom<unknown>] | [Atom<unknown>[]]): void {
+      const targets = args.length > 0 ? normalizeAtomArg(args[0]) : undefined;
+
+      if (targets) {
+        for (const a of targets) {
+          if (!mutations.has(a)) continue;
+          mutations.delete(a);
+          abortControllerFor(a);
+          notifyAtom(a);
+        }
+      } else {
+        mutations.clear();
+        abortAllControllers();
+        notifyAll();
+      }
       onDiscard.forEach((fn) => fn());
     },
 
     reset(atom: Atom<unknown>): void {
       if (!mutations.has(atom)) return;
       mutations.delete(atom);
+      abortControllerFor(atom);
       notifyAtom(atom);
       onDiscard.forEach((fn) => fn());
     },
