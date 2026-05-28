@@ -8,16 +8,16 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Getting Started', link: '/graft/getting-started' },
-      { text: 'API', link: '/graft/api' },
+      { text: 'Getting Started', link: '/getting-started' },
+      { text: 'API', link: '/api' },
       { text: 'Playground', link: '/playground' }
     ],
     sidebar: [
       {
         text: 'Guide',
         items: [
-          { text: 'Getting Started', link: '/graft/getting-started' },
-          { text: 'API Reference', link: '/graft/api' },
+          { text: 'Getting Started', link: '/getting-started' },
+          { text: 'API Reference', link: '/api' },
           { text: 'Playground', link: '/playground' }
         ]
       }
@@ -27,6 +27,7 @@ export default defineConfig({
     ]
   },
   vite: {
-    plugins: [react()]
+    plugins: [react()],
+    ssr: { noExternal: ['react', 'react-dom', 'graft', 'jotai'] }
   }
 })
