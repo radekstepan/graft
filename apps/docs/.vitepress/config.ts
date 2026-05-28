@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   title: "Graft",
   description: "Shadow Store Extensions for Jotai",
+  base: '/graft/',
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
