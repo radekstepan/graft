@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import type { Atom, WritableAtom, ExtractAtomValue, ExtractAtomArgs, ExtractAtomResult } from 'jotai';
+import type { Atom, WritableAtom } from 'jotai';
 import type { BranchStore } from './types';
 
 /**

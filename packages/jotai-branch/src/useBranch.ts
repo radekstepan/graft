@@ -36,5 +36,6 @@ export function useBranch(): BranchStore {
     branchRef.current = createBranchStore(baseStore);
   }
 
+  // eslint-disable-next-line react-hooks/refs -- intentional: branch is a stable singleton per mount
   return branchRef.current;
 }

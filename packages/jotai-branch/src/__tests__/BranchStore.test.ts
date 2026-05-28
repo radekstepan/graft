@@ -4,7 +4,7 @@
  * Each test creates a fresh Jotai store and a branch on top of it.
  * We test the store's behaviour in isolation before layering React on top.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { atom, createStore } from 'jotai';
 import { createBranchStore } from '../BranchStore';
 
@@ -238,7 +238,7 @@ describe('discard()', () => {
   });
 
   it('partial discard with array of atoms reverts only those atoms', () => {
-    const { base, branch } = makeBranch();
+    const { branch } = makeBranch();
     const a = atom(0);
     const b = atom('x');
     const c = atom(true);

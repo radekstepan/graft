@@ -181,6 +181,12 @@ export function createBranchStore(baseStore: JotaiStore): BranchStore {
     //    Jotai v2 primitive atoms have an `init` property. Derived atoms do
     //    not.  This is the most reliable distinguisher available without
     //    touching internals.
+    //
+    //    ⚠  IMPORTANT: This relies on an undocumented Jotai internal.  If
+    //    Jotai v3 changes how primitive atoms are constructed (e.g. removes
+    //    the `init` property), this heuristic will silently break and all
+    //    atoms will be treated as derived.  A v3 migration MUST audit this
+    //    check first.
     if ('init' in atom) {
       // Primitive atom — base store owns the stored value.
       return baseStore.get(atom);
