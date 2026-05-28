@@ -1,14 +1,21 @@
 import React from 'react'
 import { useBranchStatus, type BranchStore } from 'jotai-branch'
 import { todosAtom, type Todo } from './atoms'
+import type { PendingAction } from './TodoApp'
 
 interface BranchPanelProps {
   branch: BranchStore
+  pendingAction: PendingAction | null
   onCommit: () => void
   onDiscard: () => void
 }
 
-export function BranchPanel({ branch, onCommit, onDiscard }: BranchPanelProps) {
+export function BranchPanel({
+  branch,
+  pendingAction,
+  onCommit,
+  onDiscard,
+}: BranchPanelProps) {
   const { isDirty, size, diff } = useBranchStatus(branch)
 
   if (!isDirty) return null
@@ -17,6 +24,14 @@ export function BranchPanel({ branch, onCommit, onDiscard }: BranchPanelProps) {
 
   return (
     <div style={styles.panel}>
+      {pendingAction && (
+        <div style={styles.spinnerRow}>
+          <span className="todo-spinner" style={styles.spinner}>
+            &#x27F3;
+          </span>
+          <span style={styles.waiting}>Waiting for your decision&hellip;</span>
+        </div>
+      )}
       <h4 style={styles.heading}>
         <span style={styles.icon}>&#x1F33F;</span> Branch Draft
       </h4>
@@ -93,6 +108,21 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid var(--vp-c-brand-1)',
     borderRadius: '8px',
     backgroundColor: 'var(--vp-c-bg-soft)',
+  },
+  spinnerRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    marginBottom: '0.75rem',
+  },
+  spinner: {
+    fontSize: '1.2em',
+    color: 'var(--vp-c-brand-1)',
+  },
+  waiting: {
+    fontSize: '0.9em',
+    fontWeight: 500,
+    color: 'var(--vp-c-brand-1)',
   },
   heading: {
     margin: '0 0 0.75rem',

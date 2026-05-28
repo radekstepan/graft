@@ -1,18 +1,19 @@
 import React, { useState } from 'react'
-import { useSetAtom } from 'jotai'
-import { todosAtom } from './atoms'
 
-let nextId = 10
-
-export function TodoInput({ disabled }: { disabled?: boolean }) {
+export function TodoInput({
+  disabled,
+  onAdd,
+}: {
+  disabled?: boolean
+  onAdd: (title: string) => void
+}) {
   const [text, setText] = useState('')
-  const setTodos = useSetAtom(todosAtom)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const title = text.trim()
     if (!title) return
-    setTodos((prev) => [...prev, { id: String(nextId++), title, completed: false }])
+    onAdd(title)
     setText('')
   }
 

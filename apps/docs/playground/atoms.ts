@@ -38,5 +38,3 @@ export const activeCountAtom = atom((get) => {
 export const completedCountAtom = atom((get) => {
   return get(todosAtom).filter((t) => t.completed).length
 })
-
-export const apiDelayAtom = atom(600)

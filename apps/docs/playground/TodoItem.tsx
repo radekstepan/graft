@@ -5,9 +5,7 @@ import { todosAtom, type Todo } from './atoms'
 interface TodoItemProps {
   todo: Todo
   isEditing: boolean
-  isSaving: boolean
-  isDeleting: boolean
-  isError: boolean
+  isBusy: boolean
   onStartEdit: (id: string) => void
   onToggle: (todo: Todo) => void
   onDelete: (id: string) => void
@@ -18,9 +16,7 @@ interface TodoItemProps {
 export function TodoItem({
   todo,
   isEditing,
-  isSaving,
-  isDeleting,
-  isError,
+  isBusy,
   onStartEdit,
   onToggle,
   onDelete,
@@ -38,25 +34,18 @@ export function TodoItem({
   }
 
   return (
-    <div
-      className="todo-item"
-      style={{
-        ...styles.item,
-        opacity: isDeleting ? 0.5 : 1,
-      }}
-    >
+    <div className="todo-item" style={styles.item}>
       <label style={styles.checkWrap}>
         <input
           type="checkbox"
           checked={todo.completed}
           onChange={() => onToggle(todo)}
-          disabled={isSaving || isDeleting}
+          disabled={isBusy}
           style={styles.checkbox}
         />
-        {(isSaving || isDeleting) && <span className="todo-spinner" style={styles.spinner}>&#x27F3;</span>}
       </label>
       <span
-        onDoubleClick={() => !isSaving && !isDeleting && onStartEdit(todo.id)}
+        onDoubleClick={() => !isBusy && onStartEdit(todo.id)}
         style={{
           ...styles.title,
           textDecoration: todo.completed ? 'line-through' : 'none',
@@ -67,11 +56,10 @@ export function TodoItem({
       >
         {todo.title}
       </span>
-      {isError && <span style={styles.error}>reverted!</span>}
       <button
         className="todo-delete"
         onClick={() => onDelete(todo.id)}
-        disabled={isSaving || isDeleting}
+        disabled={isBusy}
         style={styles.delete}
       >
         &times;
@@ -167,14 +155,5 @@ const styles: Record<string, React.CSSProperties> = {
   editInput: {
     flex: 1,
     borderColor: 'var(--vp-c-brand)',
-  },
-  spinner: {
-    fontSize: '0.85em',
-    color: 'var(--vp-c-brand)',
-  },
-  error: {
-    color: 'var(--vp-c-danger-1)',
-    fontSize: '0.8em',
-    fontWeight: 500,
   },
 }
