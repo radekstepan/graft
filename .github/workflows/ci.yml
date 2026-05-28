@@ -27,7 +27,7 @@ jobs:
         run: yarn typecheck
       - name: Test
         run: yarn test
-        working-directory: packages/jotai-branch
+        working-directory: packages/graft
       - name: Build
         run: yarn build
-        working-directory: packages/jotai-branch
+        working-directory: packages/graft

@@ -1,5 +1,5 @@
 /**
- * React integration tests for jotai-branch hooks.
+ * React integration tests for graft hooks.
  *
  * Uses @testing-library/react + jsdom (configured in vitest.config.ts).
  * Each test renders minimal components that exercise a specific hook contract.

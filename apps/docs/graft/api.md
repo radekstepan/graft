@@ -28,7 +28,7 @@ function createBranchStore(baseStore: JotaiStore): BranchStore
 
 ```ts
 import { createStore } from 'jotai'
-import { createBranchStore } from 'jotai-branch'
+import { createBranchStore } from 'graft'
 
 const base = createStore()
 const branch = createBranchStore(base)
@@ -85,7 +85,7 @@ function BranchProvider(props: BranchProviderProps): JSX.Element
 
 ```tsx
 import { useAtom } from 'jotai'
-import { BranchProvider, useBranch } from 'jotai-branch'
+import { BranchProvider, useBranch } from 'graft'
 
 function ProfileForm() {
   const [name, setName] = useAtom(nameAtom)

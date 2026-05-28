@@ -9,8 +9,8 @@
     "preview": "vitepress preview"
   },
   "dependencies": {
+    "graft": "*",
     "jotai": "^2.12.5",
-    "jotai-branch": "*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

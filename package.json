@@ -1,5 +1,5 @@
 {
-  "name": "jotai-branch-monorepo",
+  "name": "graft-monorepo",
   "private": true,
   "workspaces": [
     "packages/*",

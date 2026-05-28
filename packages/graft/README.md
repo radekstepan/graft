@@ -1,15 +1,15 @@
-# jotai-branch
+# graft
 
-Branching Atoms — a Shadow Store extension for [Jotai](https://jotai.org) v2.
+Graft — a Shadow Store extension for [Jotai](https://jotai.org) v2.
 
 Create isolated "draft" stores on top of a base Jotai store. Mutations stay local until you explicitly commit or discard them.
 
 ## Install
 
 ```bash
-npm install jotai-branch
+npm install graft
 # or
-yarn add jotai-branch
+yarn add graft
 ```
 
 > **Peer dependencies:** `jotai@^2.0.0`, `react@^18.0.0 || ^19.0.0`
@@ -22,7 +22,7 @@ import {
   useBranch,
   BranchProvider,
   useBranchStatus,
-} from 'jotai-branch';
+} from 'graft';
 
 const nameAtom = atom('Alice');
 const ageAtom = atom(30);

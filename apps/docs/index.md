@@ -2,13 +2,13 @@
 layout: home
 
 hero:
-  name: "Branching Atoms"
+  name: "Graft"
   text: "Shadow Store Extensions for Jotai"
   tagline: "Build optimistic UIs and local drafts with zero friction."
   actions:
     - theme: brand
       text: Get Started
-      link: /jotai-branch/getting-started
+      link: /graft/getting-started
     - theme: alt
       text: Playground
       link: /playground

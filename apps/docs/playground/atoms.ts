@@ -10,7 +10,7 @@ export type Filter = 'all' | 'active' | 'completed'
 
 export const todosAtom = atom<Todo[]>([
   { id: '1', title: 'Learn Jotai', completed: false },
-  { id: '2', title: 'Try jotai-branch', completed: false },
+  { id: '2', title: 'Try graft', completed: false },
   { id: '3', title: 'Build something amazing', completed: false },
 ])
 
